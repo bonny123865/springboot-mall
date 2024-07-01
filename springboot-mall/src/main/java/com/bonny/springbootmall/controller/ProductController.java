@@ -1,5 +1,6 @@
 package com.bonny.springbootmall.controller;
 
+import com.bonny.springbootmall.constant.ProductCategory;
 import com.bonny.springbootmall.dto.ProductRequest;
 import com.bonny.springbootmall.service.ProductService;
 import jakarta.validation.Valid;
@@ -16,6 +17,22 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    // 可以使用 enum 去時做，已經會被轉換完成，需要將category從Service層 拉到Dao層裡面去
+    // "(required = false)" 代表前端不一定藥袋上這一個參數，特好用，讚
+    @GetMapping("/products")
+    public ResponseEntity<List<Product>> getProducts(
+            @RequestParam(required = false) ProductCategory category,
+            @RequestParam(required = false) String search
+            ){
+        //參數傳遞
+        List<Product> productList = productService.getProducts(category,search);
+
+        // 就算資源不存在，但是URL存在，所以都需要固定回傳 200 OK 給前端
+        return ResponseEntity.status(HttpStatus.OK).body(productList);
+    }
+
+
 
 
     //取得商品數據
@@ -68,14 +85,7 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    // 返回商品的所有數據 ，實作 "/products"
-    @GetMapping("/products")
-    public ResponseEntity<List<Product>> getProducts(){
-        List<Product> productList = productService.getProducts();
 
-        // 就算資源不存在，但是URL存在，所以都需要固定回傳 200 OK 給前端
-        return ResponseEntity.status(HttpStatus.OK).body(productList);
-    }
 
 
 }
