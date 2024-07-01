@@ -1,5 +1,6 @@
 package com.bonny.springbootmall.rowmapper;
 
+import com.bonny.springbootmall.constant.ProductCategory;
 import com.bonny.springbootmall.model.Product;
 import java.sql.ResultSet;  // Corrected import
 import org.springframework.jdbc.core.RowMapper;
@@ -13,7 +14,13 @@ public class ProductRowMapper implements RowMapper<Product> {
         Product product = new Product();
         product.setProductId(resultSet.getInt("product_id"));
         product.setProductName(resultSet.getString("product_name"));
-        product.setCategory(resultSet.getString("category"));
+
+        String categoryStr = resultSet.getString("category");
+        ProductCategory category = ProductCategory.valueOf(categoryStr);
+        product.setCategory(category);
+
+//        product.setCategory(ProductCategory.valueOf(resultSet.getString("category")));
+
         product.setImageUrl(resultSet.getString("image_url"));
         product.setPrice(resultSet.getInt("price"));
         product.setStock(resultSet.getInt("stock"));
