@@ -1,6 +1,7 @@
 package com.bonny.springbootmall.controller;
 
 import com.bonny.springbootmall.constant.ProductCategory;
+import com.bonny.springbootmall.dto.ProductQueryParams;
 import com.bonny.springbootmall.dto.ProductRequest;
 import com.bonny.springbootmall.service.ProductService;
 import jakarta.validation.Valid;
@@ -25,8 +26,14 @@ public class ProductController {
             @RequestParam(required = false) ProductCategory category,
             @RequestParam(required = false) String search
             ){
+
+        ProductQueryParams productQueryParams = new ProductQueryParams();
+        productQueryParams.setCategory(category);
+        productQueryParams.setSearch(search);
+
         //參數傳遞
-        List<Product> productList = productService.getProducts(category,search);
+//        List<Product> productList = productService.getProducts(category,search);
+        List<Product> productList = productService.getProducts(productQueryParams);
 
         // 就算資源不存在，但是URL存在，所以都需要固定回傳 200 OK 給前端
         return ResponseEntity.status(HttpStatus.OK).body(productList);
