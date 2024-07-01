@@ -59,9 +59,14 @@ public class ProductDaoImpl implements ProductDao {
             map.put("search", "%" + productQueryParams.getSearch() + "%");
         }
 
-        // 一定不會是 null，因為有預設值
+        // 排序 : 一定不會是 null所以可以直接加上去語句，因為有預設值
         sql = sql + " ORDER BY " + productQueryParams.getOrderBy() + " " + productQueryParams.getSort();
 
+
+        // 分頁 : 一定不會是 null所以可以直接加上去語句，，因為有預設值
+        sql = sql + " LIMIT :limit OFFSET :offset";
+        map.put("limit", productQueryParams.getLimit());
+        map.put("offset", productQueryParams.getOffset());
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql,map,new ProductRowMapper());
 

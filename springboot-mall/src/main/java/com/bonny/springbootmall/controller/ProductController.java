@@ -5,14 +5,18 @@ import com.bonny.springbootmall.dto.ProductQueryParams;
 import com.bonny.springbootmall.dto.ProductRequest;
 import com.bonny.springbootmall.service.ProductService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import com.bonny.springbootmall.model.Product;
 
 import java.util.List;
 
+@Validated
 @RestController
 public class ProductController {
 
@@ -33,7 +37,15 @@ public class ProductController {
             // "sort" : 升冪是降冪排列，預設使用 "desc"，這種排序只限定於單排序，只能用一個條件進行排序
             // "http://localhost:8080/products" : 會使用預設的 "創建時間" 來做排序
             @RequestParam(defaultValue = "created_date")  String orderBy,
-            @RequestParam(defaultValue = "desc")  String sort
+            @RequestParam(defaultValue = "desc")  String sort,
+
+            // 分頁 Paging
+            // limit : 限制需要取出幾個參數，目前預設 5 筆
+            // offset : 會跳過前X筆數據，預設都不跳過
+            // 如果加上 @Max、@Min : 要加上 "@Validated"
+            @RequestParam(defaultValue = "5") @Max(1000) @Min(0) Integer limit,
+            @RequestParam(defaultValue = "0") @Min(0) Integer offset
+
             ){
 
         ProductQueryParams productQueryParams = new ProductQueryParams();
@@ -41,6 +53,8 @@ public class ProductController {
         productQueryParams.setSearch(search);
         productQueryParams.setOrderBy(orderBy);
         productQueryParams.setSort(sort);
+        productQueryParams.setLimit(limit);
+        productQueryParams.setOffset(offset);
 
         //參數傳遞
 //        List<Product> productList = productService.getProducts(category,search);
