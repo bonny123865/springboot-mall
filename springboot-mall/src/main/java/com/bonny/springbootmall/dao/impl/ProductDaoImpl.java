@@ -22,42 +22,20 @@ import java.util.Map;
 @Component
 public class ProductDaoImpl implements ProductDao {
 
+    @Autowired
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     @Override
     public Integer countProduct(ProductQueryParams productQueryParams) {
         String sql = "SELECT count(*) FROM product WHERE 1=1";
 
         Map<String, Object> map = new HashMap<>();
 
-        // 查詢條件
-        if(productQueryParams.getCategory() != null){
-            sql = sql +" AND category = :category";
-            map.put("category", productQueryParams.getCategory().name());
-        }
-
-        if(productQueryParams.getSearch() != null){
-            sql = sql +" AND product_name LIKE :search";
-            map.put("search", "%" + productQueryParams.getSearch() + "%");
-        }
+        sql = addFilteringSql(sql, map, productQueryParams);
 
         Integer total = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
 
         return total;
     }
-
-    @Autowired
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
-//    @Override
-//    public List<Product> getProducts() {
-//        String sql = "SELECT product_id,product_name, category, image_url, " +
-//                "price, stock, description, created_date, last_modified_date " +
-//                "FROM product";
-//
-//        Map<String, Object> map = new HashMap<>();
-//        List<Product> productList = namedParameterJdbcTemplate.query(sql,map,new ProductRowMapper());
-//
-//        return productList;
-//    }
 
 
     // 利用 "WHERE 1=1" ，可以讓 "category != null" 去拼接查詢條件
@@ -71,16 +49,7 @@ public class ProductDaoImpl implements ProductDao {
 
         Map<String, Object> map = new HashMap<>();
 
-        // 查詢條件
-        if(productQueryParams.getCategory() != null){
-            sql = sql +" AND category = :category";
-            map.put("category", productQueryParams.getCategory().name());
-        }
-
-        if(productQueryParams.getSearch() != null){
-            sql = sql +" AND product_name LIKE :search";
-            map.put("search", "%" + productQueryParams.getSearch() + "%");
-        }
+        sql = addFilteringSql(sql, map, productQueryParams);
 
         // 排序 : 一定不會是 null所以可以直接加上去語句，因為有預設值
         sql = sql + " ORDER BY " + productQueryParams.getOrderBy() + " " + productQueryParams.getSort();
@@ -176,5 +145,24 @@ public class ProductDaoImpl implements ProductDao {
         map.put("productId", productId);
 
         namedParameterJdbcTemplate.update(sql,map);
+    }
+
+    // 提煉 : 查詢功能 (軟體的價值在於重複運用)
+    // private : 只有這個 class 可以使用這個方法，public :其他的會需要 (更好的管理程式的範圍)
+    private String addFilteringSql(String sql, Map<String,Object> map, ProductQueryParams productQueryParams){
+        // 查詢條件
+        if(productQueryParams.getCategory() != null){
+            sql = sql +" AND category = :category";
+            map.put("category", productQueryParams.getCategory().name());
+        }
+
+        if(productQueryParams.getSearch() != null){
+            sql = sql +" AND product_name LIKE :search";
+            map.put("search", "%" + productQueryParams.getSearch() + "%");
+        }
+
+        return sql;
+
+
     }
 }
