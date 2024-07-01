@@ -12,6 +12,5 @@ public class MyTest {
         String s2 = "CAR";
         ProductCategory category2 = ProductCategory.valueOf(s2);
 
-
     }
 }
