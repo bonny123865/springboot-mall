@@ -23,13 +23,24 @@ public class ProductController {
     // "(required = false)" 代表前端不一定藥袋上這一個參數，特好用，讚
     @GetMapping("/products")
     public ResponseEntity<List<Product>> getProducts(
+
+            // 查詢條件 Filtering
             @RequestParam(required = false) ProductCategory category,
-            @RequestParam(required = false) String search
+            @RequestParam(required = false) String search,
+
+            // 排序 Sorting
+            // "orderBy" : 商品類型或是什麼類別來做排序，預設使用 "defaultValue"
+            // "sort" : 升冪是降冪排列，預設使用 "desc"，這種排序只限定於單排序，只能用一個條件進行排序
+            // "http://localhost:8080/products" : 會使用預設的 "創建時間" 來做排序
+            @RequestParam(defaultValue = "created_date")  String orderBy,
+            @RequestParam(defaultValue = "desc")  String sort
             ){
 
         ProductQueryParams productQueryParams = new ProductQueryParams();
         productQueryParams.setCategory(category);
         productQueryParams.setSearch(search);
+        productQueryParams.setOrderBy(orderBy);
+        productQueryParams.setSort(sort);
 
         //參數傳遞
 //        List<Product> productList = productService.getProducts(category,search);
