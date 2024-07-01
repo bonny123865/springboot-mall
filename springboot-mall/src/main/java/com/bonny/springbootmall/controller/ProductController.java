@@ -4,6 +4,7 @@ import com.bonny.springbootmall.constant.ProductCategory;
 import com.bonny.springbootmall.dto.ProductQueryParams;
 import com.bonny.springbootmall.dto.ProductRequest;
 import com.bonny.springbootmall.service.ProductService;
+import com.bonny.springbootmall.util.Page;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -26,7 +27,7 @@ public class ProductController {
     // 可以使用 enum 去時做，已經會被轉換完成，需要將category從Service層 拉到Dao層裡面去
     // "(required = false)" 代表前端不一定藥袋上這一個參數，特好用，讚
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getProducts(
+    public ResponseEntity<Page<Product>> getProducts(
 
             // 查詢條件 Filtering
             @RequestParam(required = false) ProductCategory category,
@@ -56,12 +57,23 @@ public class ProductController {
         productQueryParams.setLimit(limit);
         productQueryParams.setOffset(offset);
 
-        //參數傳遞
+        //// 取得 product List : 參數傳遞
 //        List<Product> productList = productService.getProducts(category,search);
         List<Product> productList = productService.getProducts(productQueryParams);
 
+        // 取得 product 總數 : 因為總比數會因為查詢條件不同而改變，因此要傳回 "productQueryParams"
+        Integer total = productService.countProduct(productQueryParams);
+
+        // 分頁 Paging
+        Page<Product> page = new Page();
+        page.setLimit(limit);
+        page.setOffset(offset);
+        page.setTotal(total);
+        page.setResults(productList);
+
+
         // 就算資源不存在，但是URL存在，所以都需要固定回傳 200 OK 給前端
-        return ResponseEntity.status(HttpStatus.OK).body(productList);
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
 
