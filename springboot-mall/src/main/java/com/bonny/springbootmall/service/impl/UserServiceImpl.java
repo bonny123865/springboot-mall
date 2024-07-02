@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -34,6 +35,10 @@ public class UserServiceImpl implements UserService {
             log.warn("該 email 【{}】 已經被註冊", userRegisterRequest.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+        // 使用 MD5 Hash 生成雜湊值，將 String 轉換成 Byte 類型
+        String hashedPassword = DigestUtils.md5DigestAsHex(userRegisterRequest.getPassword().getBytes());
+        userRegisterRequest.setPassword(hashedPassword);
+
         // 創建帳號
         return userDao.createUser(userRegisterRequest);
     }
@@ -50,12 +55,17 @@ public class UserServiceImpl implements UserService {
         User user = userDao.getUserByEmail(userLoginRequest.getEmail());
 
 
+        // 檢查 user 是否存在
         if (user == null){
             log.warn("該 email 【{}】 尚未註冊", userLoginRequest.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        // 要用 "equals" 比較字串
-        if (user.getPassword().equals(userLoginRequest.getPassword())){
+
+        // 使用 MD5 Hash 生成雜湊值，將 String 轉換成 Byte 類型
+        String hashedPassword = DigestUtils.md5DigestAsHex(userLoginRequest.getPassword().getBytes());
+
+        // 要用 "equals" 比較密碼
+        if (user.getPassword().equals(hashedPassword)){
             return user;
         } else {
             log.warn("該 email 【{}】 密碼不正確", userLoginRequest.getEmail());
