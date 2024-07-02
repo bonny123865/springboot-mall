@@ -116,24 +116,25 @@ public class ProductDaoImpl implements ProductDao {
         }
     }
 
+    // 修改 - Map 當中的參數要式資料庫裏面有的，不是JAVA檔當中的變數 QQ
     @Override
     public Integer createProduct(ProductRequest productRequest) {
         String sql ="INSERT INTO product(product_name, category, image_url, price, stock," +
                 " description, created_date, last_modified_date) " +
-                "VALUES (:productName, :category, :imageUrl, :price, :stock," +
-                " :description, :createdDate, :lastModifiedDate)";
+                "VALUES (:product_name, :category, :image_url, :price, :stock," +
+                " :description, :created_date, :last_modified_date)";
 
         Map<String, Object> map = new HashMap<>();
-        map.put("productName", productRequest.getProductName());
+        map.put("product_name", productRequest.getProductName());
         map.put("category", productRequest.getCategory().toString());
-        map.put("imageUrl", productRequest.getImageUrl());
+        map.put("image_url", productRequest.getImageUrl());
         map.put("price", productRequest.getPrice());
         map.put("stock", productRequest.getStock());
         map.put("description", productRequest.getDescription());
 
         Date now = new Date();
-        map.put("createdDate", now);
-        map.put("lastModifiedDate", now);
+        map.put("created_date", now);
+        map.put("last_modified_date", now);
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         namedParameterJdbcTemplate .update(sql, new MapSqlParameterSource(map), keyHolder);
