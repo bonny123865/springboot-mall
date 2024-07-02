@@ -1,10 +1,13 @@
 package com.bonny.springbootmall.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public class UserRegisterRequest {
 
+    // 會檢查是否為 Email 格式
     @NotBlank
+    @Email
     private String email;
     @NotBlank
     private String password;

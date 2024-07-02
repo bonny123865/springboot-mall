@@ -1,10 +1,18 @@
 package com.bonny.springbootmall.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Date;
 
 public class User {
     private Integer userId;
+
+    // 或是寫上  @JsonProperty("e_mail") : 可以把在JSON當中的參數替換成 "e_mail"，而非 "email"
     private String email;
+    // 不會將 password的值 回傳給前端
+
+    @JsonIgnore
     private String password;
     private Date createdDate;
     private Date lastModifiedDate;
