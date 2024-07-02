@@ -1,6 +1,7 @@
 package com.bonny.springbootmall.service.impl;
 
 import com.bonny.springbootmall.dao.UserDao;
+import com.bonny.springbootmall.dto.UserLoginRequest;
 import com.bonny.springbootmall.dto.UserRegisterRequest;
 import com.bonny.springbootmall.model.User;
 import com.bonny.springbootmall.service.UserService;
@@ -42,7 +43,25 @@ public class UserServiceImpl implements UserService {
         return userDao.getUserById(userId);
     }
 
+    // 在Service層當中，多增加 if-else 的判斷，不要加在 Dao層
+    @Override
+    public User login(UserLoginRequest userLoginRequest) {
 
+        User user = userDao.getUserByEmail(userLoginRequest.getEmail());
+
+
+        if (user == null){
+            log.warn("該 email 【{}】 尚未註冊", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        // 要用 "equals" 比較字串
+        if (user.getPassword().equals(userLoginRequest.getPassword())){
+            return user;
+        } else {
+            log.warn("該 email 【{}】 密碼不正確", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
 
 
 }

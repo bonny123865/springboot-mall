@@ -1,5 +1,6 @@
 package com.bonny.springbootmall.controller;
 
+import com.bonny.springbootmall.dto.UserLoginRequest;
 import com.bonny.springbootmall.dto.UserRegisterRequest;
 import com.bonny.springbootmall.model.User;
 import com.bonny.springbootmall.service.UserService;
@@ -34,6 +35,14 @@ public class UserController {
 
     }
 
+    // 會將帳密回傳到系統，所以適合用 POST、(PUT強烈表達更新已存在數據)
+    @PostMapping("/users/login")
+    public ResponseEntity<User> login(@RequestBody @Valid UserLoginRequest userLoginRequest){
+
+        User user = userService.login(userLoginRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
+
+    }
 
 
 
